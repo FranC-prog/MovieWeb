@@ -9,7 +9,7 @@ const port = process.env.PORT || 3000;
 app.use(express.static('views'));
 
 // Conectar a la base de datos SQLite
-const db = new sqlite3.Database('C:\\Users\\Pablo\\OneDrive - Universidad Austral\\Bases de Datos y Recursos de Información\\Unidad 5 El lenguaje de consulta SQL\\datagrip\\movies.db');
+const db = new sqlite3.Database('C:\\Users\\franc\\projects\\bases\\BaseDatos2023\\movies.db');
 
 // Configurar el motor de plantillas EJS
 app.set('view engine', 'ejs');
