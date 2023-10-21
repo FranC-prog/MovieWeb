@@ -9,7 +9,7 @@ const port = process.env.PORT || 3000;
 app.use(express.static('views'));
 
 // Conectar a la base de datos SQLite
-const db = new sqlite3.Database('C:\\Users\\Pablo\\OneDrive - Universidad Austral\\Bases de Datos y Recursos de Información\\Unidad 5 El lenguaje de consulta SQL\\datagrip\\movies.db');
+const db = new sqlite3.Database('movies.db');
 
 // Configurar el motor de plantillas EJS
 app.set('view engine', 'ejs');
@@ -19,24 +19,57 @@ app.get('/', (req, res) => {
     res.render('index');
 });
 
-// Ruta para buscar películas
+// Ruta para la búsqueda en general (falta agregar el botón de switch para buscar por keyword)
 app.get('/buscar', (req, res) => {
     const searchTerm = req.query.q;
+    const movieQuery = 'SELECT * FROM movie WHERE title LIKE ?';
+    const actorQuery = `
+    SELECT DISTINCT person.*
+    FROM movie_cast
+    JOIN person ON person.person_id = movie_cast.person_id
+    WHERE person.person_name LIKE ?
+    `;
+    const directorQuery = 'SELECT DISTINCT person.* FROM movie_crew mcr JOIN person ON person.person_id = mcr.person_id WHERE person_name LIKE ? AND mcr.job= \'Director\'';
+    let moviesData = {};
+
 
     // Realizar la búsqueda en la base de datos
     db.all(
-        'SELECT * FROM movie WHERE title LIKE ?',
+        movieQuery,
         [`%${searchTerm}%`],
-        (err, rows) => {
+        (err, movieRows) => {
             if (err) {
                 console.error(err);
                 res.status(500).send('Error en la búsqueda.');
             } else {
-                res.render('resultado', { movies: rows });
+                moviesData.movies = movieRows;
+                db.all(actorQuery, [`%${searchTerm}%`],
+                    (err, actorRows) => {
+                        if (err) {
+                            console.error(err)
+                            res.status(500).send('Error en la búsqueda.')
+                        } else {
+                            moviesData.actors = actorRows
+                            db.all(directorQuery, [`%${searchTerm}%`],
+                                (err, directorRows)=>{
+                                if(err){
+                                    console.error(err)
+                                    res.status(500).end('Error en la búsqueda')
+                                }
+                                else{
+                                    moviesData.directors = directorRows
+                                    res.render('resultado', moviesData)}
+                                })
+                        }
+                    }
+                );
             }
         }
-    );
-});
+    )
+}
+);
+
+
 
 // Ruta para la página de datos de una película particular
 app.get('/pelicula/:id', (req, res) => {
