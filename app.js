@@ -244,7 +244,7 @@ app.get('/director/:id', (req, res) => {
     const directorId = req.params.id;
 
     // Consulta SQL para obtener las películas dirigidas por el director
-    const query = `
+    const directedQuery = `
     SELECT DISTINCT
       person.person_name as directorName,
       movie.*
@@ -253,20 +253,37 @@ app.get('/director/:id', (req, res) => {
     INNER JOIN person ON person.person_id = movie_crew.person_id
     WHERE movie_crew.job = 'Director' AND movie_crew.person_id = ?;
   `;
-
-
-    // console.log('query = ', query)
+    let directorData = {};
+    const actedQuery = `
+    SELECT DISTINCT
+      person.person_name as actorName,
+      movie.*
+    FROM movie
+    INNER JOIN movie_cast ON movie.movie_id = movie_cast.movie_id
+    INNER JOIN person ON person.person_id = movie_cast.person_id
+    WHERE movie_cast.person_id = ?;
+  `;
 
     // Ejecutar la consulta
-    db.all(query, [directorId], (err, movies) => {
+    db.all(directedQuery, [directorId], (err, directedMovies) => {
         if (err) {
             console.error(err);
             res.status(500).send('Error al cargar las películas del director.');
         } else {
-            // console.log('movies.length = ', movies.length)
             // Obtener el nombre del director
-            const directorName = movies.length > 0 ? movies[0].directorName : '';
-            res.render('director', { directorName, movies });
+            const directorName = directedMovies.length > 0 ? directedMovies[0].directorName : '';
+            directorData.directed = directedMovies;
+            directorData.directorName = directorName;
+            db.all(actedQuery, [directorId], (err,actedMovies) => {
+                if(err){
+                    console.error(err);
+                    res.status(500).send('Error al cargar las películas del director.');
+                }
+                else{
+                    directorData.acted = actedMovies;
+                    res.render('director', {directorName, directorData});
+                }
+            })
         }
     });
 });

@@ -50,9 +50,26 @@
 </head>
 <body>
 <h1>MovieWeb</h1>
-<form action="/buscar" method="GET">
-    <input type="text" name="q" placeholder="Buscar películas..." />
+<form id="myForm" action="/buscar" method="GET">
+    <input id="myInput" type="text" name="q" placeholder="Buscar películas, actores y/o directores..." />
     <button type="submit">Buscar</button>
+    <button type="button" id="myButton">⟳</button>
 </form>
+
+<script>
+    var state = 0;
+    document.getElementById('myButton').addEventListener('click', function() {
+        if(state == 0) {
+            document.getElementById('myForm').action = "/buscarClaves"; // change form action
+            document.getElementById('myInput').placeholder = "Buscar por palabras clave..."; // change input placeholder
+            state = 1;
+        } else {
+            document.getElementById('myForm').action = "/buscar"; // change form action
+            document.getElementById('myInput').placeholder = "Buscar películas, actores y/o directores..."; // change input placeholder
+            state = 0;
+        }
+    });
+</script>
+
 </body>
 </html>
