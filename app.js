@@ -78,6 +78,7 @@ app.get('/buscarClaves', (req, res) => {
             JOIN movie_keywords mk ON k.keyword_id = mk.keyword_id
             JOIN movie m on mk.movie_id = m.movie_id
             WHERE keyword_name LIKE ?
+            ORDER BY m.title ASC
     `;
         let moviesData = {};
 
