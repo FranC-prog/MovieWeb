@@ -19,7 +19,7 @@ app.get('/', (req, res) => {
     res.render('index');
 });
 
-// Ruta para la búsqueda en general (falta agregar el botón de switch para buscar por keyword)
+// Ruta para la búsqueda en general
 app.get('/buscar', (req, res) => {
     const searchTerm = req.query.q;
     const movieQuery = 'SELECT * FROM movie WHERE title LIKE ?';
@@ -69,23 +69,21 @@ app.get('/buscar', (req, res) => {
 }
 );
 
-// Ruta para la búsqueda en general (falta agregar el botón de switch para buscar por keyword)
+// Ruta para la búsqueda por keyword
 app.get('/buscarClaves', (req, res) => {
-        const searchTerm = req.query.q;
-        const movieQuery = 'SELECT * FROM movie WHERE title LIKE ?';
-        const actorQuery = `
-    SELECT DISTINCT person.*
-    FROM movie_cast
-    JOIN person ON person.person_id = movie_cast.person_id
-    WHERE person.person_name LIKE ?
+    const searchTerm = req.query.q;
+    const keywordQuery = `
+            SELECT DISTINCT m.*
+            FROM keyword k
+            JOIN movie_keywords mk ON k.keyword_id = mk.keyword_id
+            JOIN movie m on mk.movie_id = m.movie_id
+            WHERE keyword_name LIKE ?
     `;
-        const directorQuery = 'SELECT DISTINCT person.* FROM movie_crew mcr JOIN person ON person.person_id = mcr.person_id WHERE person_name LIKE ? AND mcr.job= \'Director\'';
         let moviesData = {};
-
 
         // Realizar la búsqueda en la base de datos
         db.all(
-            movieQuery,
+            keywordQuery,
             [`%${searchTerm}%`],
             (err, movieRows) => {
                 if (err) {
@@ -93,26 +91,7 @@ app.get('/buscarClaves', (req, res) => {
                     res.status(500).send('Error en la búsqueda.');
                 } else {
                     moviesData.movies = movieRows;
-                    db.all(actorQuery, [`%${searchTerm}%`],
-                        (err, actorRows) => {
-                            if (err) {
-                                console.error(err)
-                                res.status(500).send('Error en la búsqueda.')
-                            } else {
-                                moviesData.actors = actorRows
-                                db.all(directorQuery, [`%${searchTerm}%`],
-                                    (err, directorRows)=>{
-                                        if(err){
-                                            console.error(err)
-                                            res.status(500).end('Error en la búsqueda')
-                                        }
-                                        else{
-                                            moviesData.directors = directorRows
-                                            res.render('resultado', moviesData)}
-                                    })
-                            }
-                        }
-                    );
+                    res.render('resultados_keyword', moviesData);
                 }
             }
         )
