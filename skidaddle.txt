@@ -1,0 +1,57 @@
+const searchTerm = req.query.q;
+    const movieQuery = 'SELECT * FROM movie WHERE title LIKE ?';
+
+    // Realizar la búsqueda en la base de datos
+    db.all(
+        movieQuery,
+        [`%${searchTerm}%`],
+        (err, rows) => {
+            if (err) {
+                console.error(err);
+                res.status(500).send('Error en la búsqueda.');
+            } else {
+                res.locals.movies = rows;
+                // res.render('resultado', {movies: rows})
+            }
+        }
+    );
+
+}, (req, res) => {
+    const searchTerm = req.query.q;
+    const actorQuery = 'SELECT * FROM movie_cast JOIN person ON person.person_id = movie_cast.person_id WHERE person_name LIKE ?';
+
+    // Realizar la búsqueda en la base de datos
+    db.all(
+        actorQuery,
+        [`%${searchTerm}%`],
+        (err, rows) => {
+            if (err) {
+                console.error(err);
+                res.status(500).send('Error en la búsqueda.');
+            } else {
+                res.locals.actors = rows;
+                // res.render('resultado', {movies: rows})
+            }
+        }
+    );
+}, (req, res) => {
+    const searchTerm = req.query.q;
+    const directorQuery = 'SELECT * FROM movie_crew mcr JOIN person ON person.person_id = movie_cast.person_id WHERE person_name LIKE ? AND mcr.job=Director';
+
+// Realizar la búsqueda en la base de datos
+    db.all(
+        directorQuery,
+        [`%${searchTerm}%`],
+        (err, rows) => {
+            if (err) {
+                console.error(err);
+                res.status(500).send('Error en la búsqueda.');
+            } else {
+                res.locals.directors = rows;
+                // res.render('resultado', {movies: rows})
+            }
+        }
+    );
+}, (req, res) => {
+    res.render('resultado');
+}

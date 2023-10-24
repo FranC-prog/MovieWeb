@@ -9,7 +9,7 @@ const port = process.env.PORT || 3000;
 app.use(express.static('views'));
 
 // Conectar a la base de datos SQLite
-const db = new sqlite3.Database('C:\\Users\\franc\\projects\\bases\\BaseDatos2023\\movies.db');
+const db = new sqlite3.Database('movies.db');
 
 // Configurar el motor de plantillas EJS
 app.set('view engine', 'ejs');
@@ -19,24 +19,85 @@ app.get('/', (req, res) => {
     res.render('index');
 });
 
-// Ruta para buscar películas
+// Ruta para la búsqueda en general
 app.get('/buscar', (req, res) => {
     const searchTerm = req.query.q;
+    const movieQuery = 'SELECT * FROM movie WHERE title LIKE ?';
+    const actorQuery = `
+    SELECT DISTINCT person.*
+    FROM movie_cast
+    JOIN person ON person.person_id = movie_cast.person_id
+    WHERE person.person_name LIKE ?
+    `;
+    const directorQuery = 'SELECT DISTINCT person.* FROM movie_crew mcr JOIN person ON person.person_id = mcr.person_id WHERE person_name LIKE ? AND mcr.job= \'Director\'';
+    let moviesData = {};
+
 
     // Realizar la búsqueda en la base de datos
     db.all(
-        'SELECT * FROM movie WHERE title LIKE ?',
+        movieQuery,
         [`%${searchTerm}%`],
-        (err, rows) => {
+        (err, movieRows) => {
             if (err) {
                 console.error(err);
                 res.status(500).send('Error en la búsqueda.');
             } else {
-                res.render('resultado', { movies: rows });
+                moviesData.movies = movieRows;
+                db.all(actorQuery, [`%${searchTerm}%`],
+                    (err, actorRows) => {
+                        if (err) {
+                            console.error(err)
+                            res.status(500).send('Error en la búsqueda.')
+                        } else {
+                            moviesData.actors = actorRows
+                            db.all(directorQuery, [`%${searchTerm}%`],
+                                (err, directorRows)=>{
+                                if(err){
+                                    console.error(err)
+                                    res.status(500).end('Error en la búsqueda')
+                                }
+                                else{
+                                    moviesData.directors = directorRows
+                                    res.render('resultado', moviesData)}
+                                })
+                        }
+                    }
+                );
             }
         }
-    );
-});
+    )
+}
+);
+
+// Ruta para la búsqueda por keyword
+app.get('/buscarClaves', (req, res) => {
+    const searchTerm = req.query.q;
+    const keywordQuery = `
+            SELECT DISTINCT m.*
+            FROM keyword k
+            JOIN movie_keywords mk ON k.keyword_id = mk.keyword_id
+            JOIN movie m on mk.movie_id = m.movie_id
+            WHERE keyword_name LIKE ?
+            ORDER BY m.title ASC
+    `;
+        let moviesData = {};
+
+        // Realizar la búsqueda en la base de datos
+        db.all(
+            keywordQuery,
+            [`%${searchTerm}%`],
+            (err, movieRows) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500).send('Error en la búsqueda.');
+                } else {
+                    moviesData.movies = movieRows;
+                    res.render('resultados_keyword', moviesData);
+                }
+            }
+        )
+    }
+);
 
 // Ruta para la página de datos de una película particular
 app.get('/pelicula/:id', (req, res) => {
@@ -180,9 +241,65 @@ app.get('/pelicula/:id', (req, res) => {
 // Ruta para mostrar la página de un actor específico
 app.get('/actor/:id', (req, res) => {
     const actorId = req.params.id;
+    let moviesData = {};
 
     // Consulta SQL para obtener las películas en las que participó el actor
-    const query = `
+    const actedQuery = `
+    SELECT DISTINCT
+      person.person_name as actorName,
+      movie.*
+    FROM movie
+    INNER JOIN movie_cast ON movie.movie_id = movie_cast.movie_id
+    INNER JOIN person ON person.person_id = movie_cast.person_id
+    WHERE movie_cast.person_id = ?;
+  `;
+
+    const directedQuery = `
+    SELECT DISTINCT movie.*
+    FROM movie_crew mc
+    JOIN person ON mc.person_id = person.person_id
+    JOIN movie ON mc.movie_id = movie.movie_id
+    WHERE mc.job = \'Director\' AND mc.person_id = ?;
+  `;
+
+    // Ejecutar la consulta
+    db.all(actedQuery, [actorId], (err, actedMovies) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send('Error al cargar las películas del actor.');
+        } else {
+            // Obtener el nombre del actor
+            const actorName = actedMovies.length > 0 ? actedMovies[0].actorName : '';
+            moviesData.acted = actedMovies
+            db.all(directedQuery, [actorId], (err, directedMovies) => {
+                if(err) {
+                    console.error(err);
+                    res.status(500).send('Error al cargar las películas del actor')
+                } else {
+                    moviesData.directed = directedMovies
+                    res.render('actor', { actorName, moviesData } )
+                }
+            })
+        }
+    });
+});
+
+// Ruta para mostrar la página de un director específico
+app.get('/director/:id', (req, res) => {
+    const directorId = req.params.id;
+
+    // Consulta SQL para obtener las películas dirigidas por el director
+    const directedQuery = `
+    SELECT DISTINCT
+      person.person_name as directorName,
+      movie.*
+    FROM movie
+    INNER JOIN movie_crew ON movie.movie_id = movie_crew.movie_id
+    INNER JOIN person ON person.person_id = movie_crew.person_id
+    WHERE movie_crew.job = 'Director' AND movie_crew.person_id = ?;
+  `;
+    let directorData = {};
+    const actedQuery = `
     SELECT DISTINCT
       person.person_name as actorName,
       movie.*
@@ -193,47 +310,25 @@ app.get('/actor/:id', (req, res) => {
   `;
 
     // Ejecutar la consulta
-    db.all(query, [actorId], (err, movies) => {
-        if (err) {
-            console.error(err);
-            res.status(500).send('Error al cargar las películas del actor.');
-        } else {
-            // Obtener el nombre del actor
-            const actorName = movies.length > 0 ? movies[0].actorName : '';
-
-            res.render('actor', { actorName, movies });
-        }
-    });
-});
-
-// Ruta para mostrar la página de un director específico
-app.get('/director/:id', (req, res) => {
-    const directorId = req.params.id;
-
-    // Consulta SQL para obtener las películas dirigidas por el director
-    const query = `
-    SELECT DISTINCT
-      person.person_name as directorName,
-      movie.*
-    FROM movie
-    INNER JOIN movie_crew ON movie.movie_id = movie_crew.movie_id
-    INNER JOIN person ON person.person_id = movie_crew.person_id
-    WHERE movie_crew.job = 'Director' AND movie_crew.person_id = ?;
-  `;
-
-
-    // console.log('query = ', query)
-
-    // Ejecutar la consulta
-    db.all(query, [directorId], (err, movies) => {
+    db.all(directedQuery, [directorId], (err, directedMovies) => {
         if (err) {
             console.error(err);
             res.status(500).send('Error al cargar las películas del director.');
         } else {
-            // console.log('movies.length = ', movies.length)
             // Obtener el nombre del director
-            const directorName = movies.length > 0 ? movies[0].directorName : '';
-            res.render('director', { directorName, movies });
+            const directorName = directedMovies.length > 0 ? directedMovies[0].directorName : '';
+            directorData.directed = directedMovies;
+            directorData.directorName = directorName;
+            db.all(actedQuery, [directorId], (err,actedMovies) => {
+                if(err){
+                    console.error(err);
+                    res.status(500).send('Error al cargar las películas del director.');
+                }
+                else{
+                    directorData.acted = actedMovies;
+                    res.render('director', {directorName, directorData});
+                }
+            })
         }
     });
 });

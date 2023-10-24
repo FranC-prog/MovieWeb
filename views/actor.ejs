@@ -5,13 +5,25 @@
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-<h1>Películas con <%= actorName %></h1>
+<h1><%= actorName %></h1>
+<p></p>
+
+<h2>Peliculas con <%= actorName %></h2>
 <ul>
-    <% movies.sort((a, b) => new Date(b.release_date) - new Date(a.release_date)).forEach((movie) => { %>
+    <% moviesData.acted.sort((a, b) => new Date(b.release_date) - new Date(a.release_date)).forEach((movie) => { %>
         <li><a href="/pelicula/<%= movie.movie_id %>"><%= movie.title %> (<%= new Date(movie.release_date).getFullYear() %>)</a></li>
     <% }); %>
 </ul>
 <p></p>
+
+<h2>Películas dirigidas por <%= actorName %></h2>
+<ul>
+    <% moviesData.directed.sort((a, b) => new Date(b.release_date) - new Date(a.release_date)).forEach((movie) => { %>
+        <li><a href="/pelicula/<%= movie.movie_id %>"><%= movie.title %> (<%= new Date(movie.release_date).getFullYear() %>)</a></li>
+    <% }); %>
+</ul>
+<p></p>
+
 <div id="inicio"><a href="/">Inicio</a></div>
 </body>
 </html>
