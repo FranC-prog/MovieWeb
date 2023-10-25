@@ -40,6 +40,46 @@
         </li>
     <% }); %>
 </ul>
+<h3>Género:</h3>
+<ul>
+    <% movie.genres.forEach((genre) => { %>
+        <li>
+            <%= genre.genre_name %>
+        </li>
+    <% }); %>
+</ul>
+<h3>País de Producción:</h3>
+<ul>
+    <% movie.production_country.forEach((country) => { %>
+        <li>
+            <%= country.country_name %>
+        </li>
+    <% }); %>
+</ul>
+<h3>Compañía de Producción:</h3>
+<ul>
+    <% movie.company_name.forEach((company) => { %>
+        <li>
+            <%= company.company_name %>
+        </li>
+    <% }); %>
+</ul>
+<h3>Idioma:</h3>
+<ul>
+    <% movie.language_name.forEach((language) => { %>
+        <li>
+            <%= language.language_name %>
+        </li>
+    <% }); %>
+</ul>
+<h3>Keywords:</h3>
+<ul>
+    <% movie.keywords.forEach((keyword) => { %>
+        <li>
+            <%= keyword.keyword_name %>
+        </li>
+    <% }); %>
+</ul>
 <p></p>
 <div id="inicio"><a href="/">Inicio</a></div>
 </body>
