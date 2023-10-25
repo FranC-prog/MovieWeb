@@ -48,6 +48,60 @@
         </li>
     <% }); %>
 </ul>
+<h3>Presupuesto:</h3>
+<ul>
+        <li>
+                <%= movie.budget %>
+        </li>
+</ul>
+<h3>Ganancias:</h3>
+<ul>
+        <li>
+                <%= movie.revenue %>
+        </li>
+</ul>
+<h3>Duración:</h3>
+<ul>
+        <li>
+                <%= movie.runtime %>
+        </li>
+</ul>
+<h3>Estado:</h3>
+<ul>
+        <li>
+                <%= movie.movie_status %>
+        </li>
+</ul>
+<h3>Voto Promedio:</h3>
+<ul>
+        <li>
+                <%= movie.vote_count %>
+        </li>
+</ul>
+<h3>Popularidad:</h3>
+<ul>
+        <li>
+                <%= movie.popularity %>
+        </li>
+</ul>
+<h3>Tagline:</h3>
+<ul>
+        <li>
+                <%= movie.tagline %>
+        </li>
+</ul>
+<h3>Página:</h3>
+<ul>
+        <li>
+                <a href="<%= movie.homepage %>">Página</a>
+        </li>
+</ul>
+<h3>Cantidad de Votos:</h3>
+<ul>
+        <li>
+                <%= movie.movie_status %>
+        </li>
+</ul>
 <h3>País de Producción:</h3>
 <ul>
     <% movie.production_country.forEach((country) => { %>
