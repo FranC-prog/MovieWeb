@@ -157,15 +157,16 @@ app.get('/pelicula/:id', (req, res) => {
     // Consulta SQL para obtener los idiomas de la pelicula
     const queryLanguage = `
     SELECT DISTINCT
-        language_name,
         language_role,
+        language_name,
         language_code
     
     FROM movie
     LEFT JOIN movie_languages ON movie.movie_id = movie_languages.movie_id
     LEFT JOIN language ON movie_languages.language_id = language.language_id
     LEFT JOIN language_role ON movie_languages.language_role_id = language_role.role_id
-    WHERE movie.movie_id = ?;
+    WHERE movie.movie_id = ?
+    ORDER BY language_role ASC;
    `;
     // Consulta SQL para obtener las keywords de la pelicula
     const queryKeywords = `
