@@ -299,30 +299,6 @@ app.get('/pelicula/:id', (req, res) => {
                     }
                 }
             });
-            // Crear un objeto para almacenar las keywords
-            rows.forEach((row) => {
-                if (row.keyword_name && row.crew_member_name && row.department_name && row.job) {
-                    // Verificar si ya existe una entrada con los mismos valores en el crew
-                    const isDuplicate = movieData.crew.some((crew_member) =>
-                        crew_member.crew_member_id === row.crew_member_id
-                    );
-
-                    // console.log('movieData.crew: ', movieData.crew)
-                    // console.log(isDuplicate, ' - row.crew_member_id: ', row.crew_member_id)
-                    if (!isDuplicate) {
-                        // Si no existe, agregar los datos a la lista de crew
-                        if (row.department_name !== 'Directing' && row.job !== 'Director'
-                            && row.department_name !== 'Writing' && row.job !== 'Writer') {
-                            movieData.crew.push({
-                                crew_member_id: row.crew_member_id,
-                                crew_member_name: row.crew_member_name,
-                                department_name: row.department_name,
-                                job: row.job,
-                            });
-                        }
-                    }
-                }
-            });
 
             //anida los datos extras de las peliculas, los guarda en sus objetos correspondientes y luego renderiza la pagina al final
             db.all(queryGenre, [movieId], (err, rows2) => {
