@@ -8,7 +8,7 @@
 <h1><%= actorName %></h1>
 <p></p>
 
-<h2>Peliculas con <%= actorName %></h2>
+<h2>Películas con <%= actorName %></h2>
 <ul>
     <% moviesData.acted.sort((a, b) => new Date(b.release_date) - new Date(a.release_date)).forEach((movie) => { %>
         <li><a href="/pelicula/<%= movie.movie_id %>"><%= movie.title %> (<%= new Date(movie.release_date).getFullYear() %>)</a></li>
