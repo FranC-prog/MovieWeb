@@ -71,26 +71,38 @@ app.get('/buscar', (req, res) => {
 // Ruta para la búsqueda por keyword
 app.get('/buscarClaves', (req, res) => {
     const searchTerm = req.query.q;
-    const keywordQuery = `
+    const keywordList = searchTerm.split(" "); //Declaramos una lista de keywords, las cuales buscará con un "OR", incluyendo todos los resultados
+    let keywordQuery = `
             SELECT DISTINCT m.*
             FROM keyword k
             JOIN movie_keywords mk ON k.keyword_id = mk.keyword_id
             JOIN movie m on mk.movie_id = m.movie_id
-            WHERE keyword_name LIKE ?
+            WHERE {}
             ORDER BY m.title ASC
     `; //Query para buscar por keyword
         let moviesData = {}; //Diccionario donde vamos a ir agregando los resultados de la búsqueda, desde el cual vamos a acceder en las correspondientes páginas de .ejs
+        let condition = '';
+
+    for (let i = 0; i < keywordList.length; i++){ //Iteramos sobre toda la lista de keywords y las vamos agregando a la condición, para mostrarla con los resultados
+        const item = keywordList[i];
+        condition += 'keyword_name LIKE \'%' + item + '%\'';
+        if (i < keywordList.length - 1) {
+            condition += ' OR ';
+        }
+    }
+    keywordQuery = keywordQuery.replace('{}', condition); //Reemplazamos la condición de la query
+    console.log(keywordQuery);
 
         // Realizar la búsqueda en la base de datos
         db.all(
             keywordQuery,
-            [`%${searchTerm}%`],
             (err, movieRows) => {
                 if (err) {
                     console.error(err);
                     res.status(500).send('Error en la búsqueda.');
                 } else {
                     moviesData.movies = movieRows; //Agregamos los datos al diccionario en el callback
+                    moviesData.movies.push();//Pusheamos los datos para acomodar el arreglo
                     res.render('resultados_keyword', moviesData); //Renderizamos los resultados para mostrarlo
                 }
             }
