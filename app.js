@@ -32,7 +32,6 @@ app.get('/buscar', (req, res) => {
     const directorQuery = 'SELECT DISTINCT person.* FROM movie_crew mcr JOIN person ON person.person_id = mcr.person_id WHERE person_name LIKE ? AND mcr.job= \'Director\''; //Query para obtener la información de todos los actores que coincidan con el término de búsqueda
     let moviesData = {}; //Diccionario donde vamos a ir agregando los resultados de la búsqueda, desde el cual vamos a acceder en las correspondientes páginas de .ejs
 
-
     // Realizar la búsqueda en la base de datos
     db.all(
         movieQuery,
