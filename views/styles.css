@@ -57,7 +57,7 @@ a:hover {
     display: block;
 }
 
-#overview {
+#cast, #numbers {
     width: 50%;
     margin: 0 auto; /* Centrar horizontalmente el elemento */
     padding: 10px; /* Agregar un poco de espacio interior para que se vea mejor */

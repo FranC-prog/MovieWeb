@@ -6,134 +6,146 @@
 </head>
 <body>
 <h1><%= movie.title %></h1>
-<h3>Fecha: <%= movie.release_date %></h3>
-<h3>Dirigida por: </h3>
-<ul>
-        <% movie.directors.forEach((director) => { %>
-                <li>
-                        <a href="/director/<%= director.crew_member_id %>"><%= director.crew_member_name %></a>
-                </li>
-        <% }); %>
-</ul>
-<h3>Escrita por: </h3>
-<ul>
-        <% movie.writers.forEach((writer) => { %>
-                <li>
-                        <%= writer.crew_member_name %>
-                </li>
-        <% }); %>
-</ul>
-<h3>Argumento:</h3>
-<div id="overview"><p><%= movie.overview %></p></div>
-<h3>Elenco:</h3>
-<ul>
-        <% movie.cast.sort((a, b) => a.cast_order - b.cast_order).forEach((actor) => { %>
-                <li><a href="/actor/<%= actor.actor_id %>"><%= actor.actor_name %></a> - <%= actor.character_name %></li>
-        <% }); %>
-</ul>
-<h3>Crew:</h3>
-<ul>
-        <% movie.crew.forEach((crewMember) => { %>
-                <li>
-                        <%= crewMember.crew_member_name %> - <%= crewMember.department_name %>
-                        (<%= crewMember.job %>)
-                </li>
-        <% }); %>
-</ul>
-<h3>Género:</h3>
-<ul>
-        <% movie.genres.forEach((genre) => { %>
-                <li>
-                        <%= genre.genre_name %>
-                </li>
-        <% }); %>
-</ul>
-<h3>Presupuesto:</h3>
-<ul>
-        <li>
-            $  <%= movie.budget %>
-        </li>
-</ul>
-<h3>Ganancias:</h3>
-<ul>
-        <li>
-            $  <%= movie.revenue %>
-        </li>
-</ul>
-<h3>Duración:</h3>
-<ul>
-        <li>
-                <%= movie.runtime %> min
-        </li>
-</ul>
-<h3>Estado:</h3>
-<ul>
-        <li>
+<i><h2><%= movie.tagline %></h2></i>
+
+<div style="display: flex; justify-content: space-between; margin: 0 auto;">
+    <div style="padding: 40px"><h3>Fecha: <%= movie.release_date %></h3>
+        <h3>Estado:</h3>
+        <ul>
+            <li>
                 <%= movie.movie_status %>
-        </li>
-</ul>
-<h3>Voto Promedio:</h3>
-<ul>
-        <li>
-                <%= movie.vote_average %>
-        </li>
-</ul>
-<h3>Popularidad:</h3>
-<ul>
-        <li>
-                <%= movie.popularity %>
-        </li>
-</ul>
-<h3>Tagline:</h3>
-<ul>
-        <li>
-                <%= movie.tagline %>
-        </li>
-</ul>
-<h3>Página:</h3>
-<ul>
-        <li>
+            </li>
+        </ul>
+        <h3>Dirigida por: </h3>
+        <ul>
+            <% movie.directors.forEach((director) => { %>
+                <li>
+                    <a href="/director/<%= director.crew_member_id %>"><%= director.crew_member_name %></a>
+                </li>
+            <% }); %>
+        </ul>
+        <h3>Escrita por: </h3>
+        <ul>
+            <% movie.writers.forEach((writer) => { %>
+                <li>
+                    <%= writer.crew_member_name %>
+                </li>
+            <% }); %>
+        </ul>
+        <h3>Género:</h3>
+        <ul>
+            <% movie.genres.forEach((genre) => { %>
+                <li>
+                    <%= genre.genre_name %>
+                </li>
+            <% }); %>
+        </ul>
+        <h3>Presupuesto:</h3>
+        <ul>
+            <li>
+                $  <%= movie.budget %>
+            </li>
+        </ul>
+        <h3>Ganancias:</h3>
+        <ul>
+            <li>
+                $  <%= movie.revenue %>
+            </li>
+        </ul>
+        <h3>Duración:</h3>
+        <ul>
+            <li>
+                <%= movie.runtime %> min
+            </li>
+        </ul>
+        <h3>Página:</h3>
+        <ul>
+            <li>
                 <a href="<%= movie.homepage %>">Página</a>
-        </li>
-</ul>
-<h3>Cantidad de Votos:</h3>
-<ul>
-        <li>
-                <%= movie.vote_count %>
-        </li>
-</ul>
-<h3>País de Producción:</h3>
-<ul>
-        <% movie.production_country.forEach((country) => { %>
+            </li>
+        </ul>
+
+        <h3>País de Producción:</h3>
+        <ul>
+            <% movie.production_country.forEach((country) => { %>
                 <li>
-                        <%= country.country_name %>
+                    <%= country.country_name %>
                 </li>
-        <% }); %>
-</ul>
-<h3>Compañía de Producción:</h3>
-<ul>
-        <% movie.company_name.forEach((company) => { %>
+            <% }); %>
+        </ul>
+        <h3>Compañía de Producción:</h3>
+        <ul>
+            <% movie.company_name.forEach((company) => { %>
                 <li>
-                        <%= company.company_name %>
+                    <%= company.company_name %>
                 </li>
-        <% }); %>
-</ul>
-<h3>Idioma:</h3>
-<ul>
-        <% movie.language_name.forEach((language) => { %>
+            <% }); %>
+        </ul>
+        <h3>Idioma:</h3>
+        <ul>
+            <% movie.language_name.forEach((language) => { %>
                 <li>
-                        <%= language.language_role %>: <%= language.language_name %>
+                    <%= language.language_role %>: <%= language.language_name %>
                 </li>
-        <% }); %>
-</ul>
-<h3>Keywords:</h3>
-<ul>
-        <% movie.keywords.forEach((keyword) => { %>
+            <% }); %>
+        </ul>
+        <h3>Keywords:</h3>
+        <ul>
+            <% movie.keywords.forEach((keyword) => { %>
                 <li>
-                        <%= keyword.keyword_name %>
+                    <%= keyword.keyword_name %>
                 </li>
-        <% }); %>
-</ul>
+            <% }); %>
+        </ul>
+    </div>
+    <div style="padding: 40px">
+        <div style="display: flex;" id="numbers">
+            <div style="text-align: center; padding: 10px;">
+                <h1><%= movie.vote_average %></h1>
+                <h3>Voto Promedio</h3>
+            </div>
+            <div style="text-align: center; padding: 10px;">
+                <h1><%= movie.vote_count %></h1>
+                <h3>Cantidad de Votos</h3>
+            </div>
+            <div style="text-align: center; padding: 10px;">
+                <h1><%= movie.popularity %></h1>
+                <h3>Popularidad</h3>
+            </div>
+        </div>
+        <h3>Argumento:</h3>
+        <div id="overview"><p><%= movie.overview %></p></div>
+        <div style="display: flex; justify-content: space-between;">
+            <div>
+                <h3>Elenco:</h3>
+                <ul>
+                    <% movie.cast.sort((a, b) => a.cast_order - b.cast_order).forEach((actor) => { %>
+                        <li id="cast"><a href="/actor/<%= actor.actor_id %>"><%= actor.actor_name %></a> - <%= actor.character_name %></li>
+                    <% }); %>
+                </ul>
+            </div>
+            <div>
+                <h3>Crew:</h3>
+                <ul>
+                    <% movie.crew.forEach((crewMember) => { %>
+                        <li>
+                            <%= crewMember.crew_member_name %> - <%= crewMember.department_name %>
+                            (<%= crewMember.job %>)
+                        </li>
+                    <% }); %>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
 <p></p>
 <div id="inicio"><a href="/">Inicio</a></div>
 </body>

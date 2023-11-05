@@ -74,6 +74,8 @@
 <script>
     var state = 0;
     document.getElementById('searchType').addEventListener('click', function() {
+        // Si se toca el botón estando la búsqueda por películas, actores y/o directores,
+        // entonces pasamos a buscar por palabras clave, y viceversa.
         if(state == 0) {
             document.getElementById('form').action = "/buscarClaves"; // change form action
             document.getElementById('input').placeholder = "Buscar por palabras clave..."; // change input placeholder
