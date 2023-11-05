@@ -72,26 +72,38 @@ app.get('/buscar', (req, res) => {
 // Ruta para la búsqueda por keyword
 app.get('/buscarClaves', (req, res) => {
     const searchTerm = req.query.q;
-    const keywordQuery = `
+    const keywordList = searchTerm.split(" "); // get a list of keywords
+    let keywordQuery = `
             SELECT DISTINCT m.*
             FROM keyword k
             JOIN movie_keywords mk ON k.keyword_id = mk.keyword_id
             JOIN movie m on mk.movie_id = m.movie_id
-            WHERE keyword_name LIKE ?
+            WHERE {}
             ORDER BY m.title ASC
     `;
         let moviesData = {};
+        let condition = '';
 
-        // Realizar la búsqueda en la base de datos
+        for (let i = 0; i < keywordList.length; i++){
+            const item = keywordList[i];
+            condition += 'keyword_name LIKE \'%' + item + '%\'';
+            if (i < keywordList.length - 1) {
+                condition += ' OR ';
+            }
+        }
+        keywordQuery = keywordQuery.replace('{}', condition);
+        console.log(keywordQuery);
+
+    // Realizar la búsqueda en la base de datos
         db.all(
             keywordQuery,
-            [`%${searchTerm}%`],
             (err, movieRows) => {
                 if (err) {
                     console.error(err);
                     res.status(500).send('Error en la búsqueda.');
                 } else {
                     moviesData.movies = movieRows;
+                    moviesData.movies.push()
                     res.render('resultados_keyword', moviesData);
                 }
             }
