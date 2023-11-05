@@ -21,16 +21,16 @@ app.get('/', (req, res) => {
 
 // Ruta para la búsqueda en general
 app.get('/buscar', (req, res) => {
-    const searchTerm = req.query.q;
-    const movieQuery = 'SELECT * FROM movie WHERE title LIKE ?';
+    const searchTerm = req.query.q; //Término de búsqueda, lo que se ingresa en el buscador
+    const movieQuery = 'SELECT * FROM movie WHERE title LIKE ?'; //Query para obtener toda la información de una cierta película que coincidan con el término de búsqueda
     const actorQuery = `
     SELECT DISTINCT person.*
     FROM movie_cast
     JOIN person ON person.person_id = movie_cast.person_id
     WHERE person.person_name LIKE ?
-    `;
-    const directorQuery = 'SELECT DISTINCT person.* FROM movie_crew mcr JOIN person ON person.person_id = mcr.person_id WHERE person_name LIKE ? AND mcr.job= \'Director\'';
-    let moviesData = {};
+    `; //Query para obtener la información de todos los actores que coincidan con el término de búsqueda
+    const directorQuery = 'SELECT DISTINCT person.* FROM movie_crew mcr JOIN person ON person.person_id = mcr.person_id WHERE person_name LIKE ? AND mcr.job= \'Director\''; //Query para obtener la información de todos los actores que coincidan con el término de búsqueda
+    let moviesData = {}; //Diccionario donde vamos a ir agregando los resultados de la búsqueda, desde el cual vamos a acceder en las correspondientes páginas de .ejs
 
 
     // Realizar la búsqueda en la base de datos
@@ -42,14 +42,14 @@ app.get('/buscar', (req, res) => {
                 console.error(err);
                 res.status(500).send('Error en la búsqueda.');
             } else {
-                moviesData.movies = movieRows;
-                db.all(actorQuery, [`%${searchTerm}%`],
+                moviesData.movies = movieRows; //Agregamos las coincidencias de películas al diccionario
+                db.all(actorQuery, [`%${searchTerm}%`], //Realizamos una de las queries restantes en el callback
                     (err, actorRows) => {
                         if (err) {
                             console.error(err)
                             res.status(500).send('Error en la búsqueda.')
                         } else {
-                            moviesData.actors = actorRows
+                            moviesData.actors = actorRows //Agregamos las coincidencias de actores al diccionario
                             db.all(directorQuery, [`%${searchTerm}%`],
                                 (err, directorRows)=>{
                                 if(err){
@@ -57,8 +57,8 @@ app.get('/buscar', (req, res) => {
                                     res.status(500).end('Error en la búsqueda')
                                 }
                                 else{
-                                    moviesData.directors = directorRows
-                                    res.render('resultado', moviesData)}
+                                    moviesData.directors = directorRows //Agregamos las coincidencias de directores al diccionario
+                                    res.render('resultado', moviesData)} //Renderizamos todos los datos para mostrarlos posteriormente en las páginas correspondientes
                                 })
                         }
                     }
@@ -79,8 +79,8 @@ app.get('/buscarClaves', (req, res) => {
             JOIN movie m on mk.movie_id = m.movie_id
             WHERE keyword_name LIKE ?
             ORDER BY m.title ASC
-    `;
-        let moviesData = {};
+    `; //Query para buscar por keyword
+        let moviesData = {}; //Diccionario donde vamos a ir agregando los resultados de la búsqueda, desde el cual vamos a acceder en las correspondientes páginas de .ejs
 
         // Realizar la búsqueda en la base de datos
         db.all(
@@ -91,8 +91,8 @@ app.get('/buscarClaves', (req, res) => {
                     console.error(err);
                     res.status(500).send('Error en la búsqueda.');
                 } else {
-                    moviesData.movies = movieRows;
-                    res.render('resultados_keyword', moviesData);
+                    moviesData.movies = movieRows; //Agregamos los datos al diccionario en el callback
+                    res.render('resultados_keyword', moviesData); //Renderizamos los resultados para mostrarlo
                 }
             }
         )
@@ -101,7 +101,7 @@ app.get('/buscarClaves', (req, res) => {
 
 // Ruta para la página de datos de una película particular
 app.get('/pelicula/:id', (req, res) => {
-    const movieId = req.params.id;
+    const movieId = req.params.id; //Parámetro de búsqueda (movieId en este caso)
 
     // Consulta SQL para obtener los datos de la película, elenco y crew
     const query = `
@@ -300,7 +300,7 @@ app.get('/pelicula/:id', (req, res) => {
                 }
             });
 
-            //anida los datos extras de las peliculas, los guarda en sus objetos correspondientes y luego renderiza la pagina al final
+            //Anida los datos extras de las películas, los guarda en sus objetos correspondientes y luego renderiza la página al final
             db.all(queryGenre, [movieId], (err, rows2) => {
 
                 movieData.genres = rows2
@@ -338,7 +338,7 @@ app.get('/pelicula/:id', (req, res) => {
 // Ruta para mostrar la página de un actor específico
 app.get('/actor/:id', (req, res) => {
     const actorId = req.params.id;
-    let moviesData = {};
+    let moviesData = {}; //Diccionario donde vamos a ir agregando los resultados de la búsqueda, desde el cual vamos a acceder en las correspondientes páginas de .ejs
 
     // Consulta SQL para obtener las películas en las que participó el actor
     const actedQuery = `
@@ -349,7 +349,7 @@ app.get('/actor/:id', (req, res) => {
     INNER JOIN movie_cast ON movie.movie_id = movie_cast.movie_id
     INNER JOIN person ON person.person_id = movie_cast.person_id
     WHERE movie_cast.person_id = ?;
-  `;
+  `; //Query para mostrar las películas en las cuales actuó una cierta persona
 
     const directedQuery = `
     SELECT DISTINCT movie.*
@@ -357,7 +357,7 @@ app.get('/actor/:id', (req, res) => {
     JOIN person ON mc.person_id = person.person_id
     JOIN movie ON mc.movie_id = movie.movie_id
     WHERE mc.job = \'Director\' AND mc.person_id = ?;
-  `;
+  `; //Query para mostrar las películas que dirigió una cierta persona
 
     // Ejecutar la consulta
     db.all(actedQuery, [actorId], (err, actedMovies) => {
@@ -367,14 +367,14 @@ app.get('/actor/:id', (req, res) => {
         } else {
             // Obtener el nombre del actor
             const actorName = actedMovies.length > 0 ? actedMovies[0].actorName : '';
-            moviesData.acted = actedMovies
-            db.all(directedQuery, [actorId], (err, directedMovies) => {
+            moviesData.acted = actedMovies //Agregamos las películas en las que actuó al diccionario
+            db.all(directedQuery, [actorId], (err, directedMovies) => { //Realizamos la otra query en el callback
                 if(err) {
                     console.error(err);
                     res.status(500).send('Error al cargar las películas del actor')
                 } else {
-                    moviesData.directed = directedMovies
-                    res.render('actor', { actorName, moviesData } )
+                    moviesData.directed = directedMovies //Agregamos las películas que dirigió al diccionario
+                    res.render('actor', { actorName, moviesData } ) //Renderizamos los resultados para mostrarlos
                 }
             })
         }
@@ -394,8 +394,8 @@ app.get('/director/:id', (req, res) => {
     INNER JOIN movie_crew ON movie.movie_id = movie_crew.movie_id
     INNER JOIN person ON person.person_id = movie_crew.person_id
     WHERE movie_crew.job = 'Director' AND movie_crew.person_id = ?;
-  `;
-    let directorData = {};
+  `; //Query para mostrar las películas que dirigió una cierta persona
+    let directorData = {}; //Diccionario donde vamos a ir agregando los resultados de la búsqueda, desde el cual vamos a acceder en las correspondientes páginas de .ejs
     const actedQuery = `
     SELECT DISTINCT
       person.person_name as actorName,
@@ -403,7 +403,7 @@ app.get('/director/:id', (req, res) => {
     FROM movie
     INNER JOIN movie_cast ON movie.movie_id = movie_cast.movie_id
     INNER JOIN person ON person.person_id = movie_cast.person_id
-    WHERE movie_cast.person_id = ?;
+    WHERE movie_cast.person_id = ?; //Query para mostrar las películas en las que actuó una cierta persona
   `;
 
     // Ejecutar la consulta
@@ -414,16 +414,16 @@ app.get('/director/:id', (req, res) => {
         } else {
             // Obtener el nombre del director
             const directorName = directedMovies.length > 0 ? directedMovies[0].directorName : '';
-            directorData.directed = directedMovies;
-            directorData.directorName = directorName;
-            db.all(actedQuery, [directorId], (err,actedMovies) => {
+            directorData.directed = directedMovies; //Agregamos las películas que dirigió al diccionario
+            directorData.directorName = directorName; //Agregamos el nombre del director al diccionario
+            db.all(actedQuery, [directorId], (err,actedMovies) => { //Realizamos la otra query en el callback
                 if(err){
                     console.error(err);
                     res.status(500).send('Error al cargar las películas del director.');
                 }
                 else{
-                    directorData.acted = actedMovies;
-                    res.render('director', {directorName, directorData});
+                    directorData.acted = actedMovies; //Agregamos las películas en las que actuó al diccionario
+                    res.render('director', {directorName, directorData});//Renderizamos los resultados para mostrarlos
                 }
             })
         }
