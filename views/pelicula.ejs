@@ -7,9 +7,24 @@
 <body>
 <h1><%= movie.title %></h1>
 <i><h2><%= movie.tagline %></h2></i>
+<div style="display: flex;" id="numbers">
+    <div style="text-align: center; padding: 10px;">
+        <h1><%= movie.vote_average %></h1>
+        <h3>Voto Promedio</h3>
+    </div>
+    <div style="text-align: center; padding: 10px;">
+        <h1><%= movie.vote_count %></h1>
+        <h3>Cantidad de Votos</h3>
+    </div>
+    <div style="text-align: center; padding: 10px;">
+        <h1><%= movie.popularity %></h1>
+        <h3>Popularidad</h3>
+    </div>
+</div>
 
 <div style="display: flex; justify-content: space-between; margin: 0 auto;">
-    <div style="padding: 40px"><h3>Fecha: <%= movie.release_date %></h3>
+    <div id="info-and-stats">
+        <h3>Fecha: <%= movie.release_date %></h3>
         <h3>Estado:</h3>
         <ul>
             <li>
@@ -98,25 +113,11 @@
             <% }); %>
         </ul>
     </div>
-    <div style="padding: 40px">
-        <div style="display: flex;" id="numbers">
-            <div style="text-align: center; padding: 10px;">
-                <h1><%= movie.vote_average %></h1>
-                <h3>Voto Promedio</h3>
-            </div>
-            <div style="text-align: center; padding: 10px;">
-                <h1><%= movie.vote_count %></h1>
-                <h3>Cantidad de Votos</h3>
-            </div>
-            <div style="text-align: center; padding: 10px;">
-                <h1><%= movie.popularity %></h1>
-                <h3>Popularidad</h3>
-            </div>
-        </div>
+    <div id="main-section" style="padding: 40px">
         <h3>Argumento:</h3>
         <div id="overview"><p><%= movie.overview %></p></div>
-        <div style="display: flex; justify-content: space-between;">
-            <div>
+        <div style="display: flex; gap: 40px">
+            <div style="flex: 1">
                 <h3>Elenco:</h3>
                 <ul>
                     <% movie.cast.sort((a, b) => a.cast_order - b.cast_order).forEach((actor) => { %>
@@ -124,11 +125,11 @@
                     <% }); %>
                 </ul>
             </div>
-            <div>
+            <div style="flex: 1">
                 <h3>Crew:</h3>
                 <ul>
                     <% movie.crew.forEach((crewMember) => { %>
-                        <li>
+                        <li id="crew">
                             <%= crewMember.crew_member_name %> - <%= crewMember.department_name %>
                             (<%= crewMember.job %>)
                         </li>

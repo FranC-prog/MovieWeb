@@ -57,14 +57,33 @@ a:hover {
     display: block;
 }
 
-#cast, #numbers {
-    width: 50%;
+#cast, #crew {
+    width: 100%;
     margin: 0 auto; /* Centrar horizontalmente el elemento */
     padding: 10px; /* Agregar un poco de espacio interior para que se vea mejor */
     background-color: #ffffff; /* Opcional: agregar un fondo blanco al elemento */
 }
 
+#cast {
+
+}
+
 #inicio {
     margin: 0 auto; /* Centrar horizontalmente el elemento */
     padding: 50px; /* Agregar un poco de espacio interior para que se vea mejor */
+}
+
+#overview {
+    text-align: justify;
+}
+
+#info-and-stats {
+    flex: 1;
+    padding: 10px;
+    margin: 20px;
+    background-color: #ffffff;
+}
+
+#main-section {
+    flex: 4;
 }
